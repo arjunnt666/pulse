@@ -1,0 +1,10 @@
+[package]
+name = "pulse-protocol"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+pulse-core = { path = "../pulse-core" }
+serde = { workspace = true }
+bytes = { workspace = true }
