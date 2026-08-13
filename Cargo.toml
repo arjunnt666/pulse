@@ -1,0 +1,38 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/pulse-core",
+    "crates/pulse-protocol",
+    "crates/pulse-interest",
+    "crates/pulse-snapshot",
+    "crates/pulse-prediction",
+    "crates/pulse-transport",
+    "crates/pulse-server",
+    "crates/pulse-client",
+    "crates/pulse-cli",
+]
+default-members = ["crates/pulse-cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/arjunnt666/pulse"
+authors = ["Arjun NT"]
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+anyhow = "1"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+tracing = "0.1"
+bytes = "1"
+parking_lot = "0.12"
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+
+[profile.release]
+lto = true
+codegen-units = 1
