@@ -1,0 +1,15 @@
+[package]
+name = "pulse-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+pulse-core = { path = "../pulse-core" }
+pulse-protocol = { path = "../pulse-protocol" }
+pulse-interest = { path = "../pulse-interest" }
+pulse-snapshot = { path = "../pulse-snapshot" }
+pulse-transport = { path = "../pulse-transport" }
+tokio = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }

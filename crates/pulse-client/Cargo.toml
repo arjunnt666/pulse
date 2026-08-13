@@ -1,0 +1,13 @@
+[package]
+name = "pulse-client"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+pulse-core = { path = "../pulse-core" }
+pulse-protocol = { path = "../pulse-protocol" }
+pulse-prediction = { path = "../pulse-prediction" }
+pulse-transport = { path = "../pulse-transport" }
+tokio = { workspace = true }
+tracing = { workspace = true }
