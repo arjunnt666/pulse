@@ -1,12 +1,13 @@
 # Changelog
 
-## 0.1.1 — unreleased
+## 0.1.2
 
-- document default lag compensation rewind window (120ms target)
-- note interest radius is a starting point, not a tuned value
-- clarify snapshot delta encoder is still naive field-level
+- STATUS.md
+
+## 0.1.1
+
+- lag compensation notes, roadmap
 
 ## 0.1.0
 
 - initial public skeleton
-- interest, snapshots, prediction, transport, server/client loops
