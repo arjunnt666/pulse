@@ -10,8 +10,10 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Run a tiny in-process server tick loop for a few ticks
     Demo {
-        #[arg(long, default_value = "10")] ticks: u32,
+        #[arg(long, default_value = "10")]
+        ticks: u32,
     },
     Version,
 }
@@ -23,7 +25,9 @@ async fn main() -> anyhow::Result<()> {
     match cli.command {
         Commands::Demo { ticks } => {
             let mut server = Server::new(60);
-            for _ in 0..ticks { server.tick()?; }
+            for _ in 0..ticks {
+                server.tick()?;
+            }
             println!("ran {} ticks, current={}", ticks, server.current_tick());
         }
         Commands::Version => println!("pulse 0.1.0"),
