@@ -54,6 +54,22 @@ impl Snapshot {
         }
         ServerMessage::Delta { tick: self.tick, base_tick: base.tick, updates, removed }
     }
+
+    pub fn interpolate(a: &Snapshot, b: &Snapshot, t: f32) -> Snapshot {
+        let t = t.clamp(0.0, 1.0);
+        let mut entities = HashMap::new();
+        for (id, ea) in &a.entities {
+            if let Some(eb) = b.entities.get(id) {
+                entities.insert(*id, ea.lerp(eb, t));
+            } else {
+                entities.insert(*id, ea.clone());
+            }
+        }
+        Snapshot {
+            tick: if t < 1.0 { a.tick } else { b.tick },
+            entities,
+        }
+    }
 }
 
 pub struct SnapshotBuffer {
@@ -73,4 +89,42 @@ impl SnapshotBuffer {
         self.history.iter().find(|s| s.tick == tick)
     }
     pub fn latest(&self) -> Option<&Snapshot> { self.history.last() }
+    pub fn len(&self) -> usize { self.history.len() }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pulse_core::{EntityId, Vec3};
+
+    fn ent(x: f32) -> EntityState {
+        EntityState {
+            id: EntityId::new(),
+            position: Vec3::new(x, 0.0, 0.0),
+            rotation: 0.0,
+            velocity: Vec3::new(1.0, 0.0, 0.0),
+            components: vec![],
+        }
+    }
+
+    #[test]
+    fn interpolate_halfway() {
+        let id = EntityId::new();
+        let mut a = Snapshot::new(Tick::new(1), vec![]);
+        let mut b = Snapshot::new(Tick::new(2), vec![]);
+        let e0 = EntityState {
+            id,
+            position: Vec3::new(0.0, 0.0, 0.0),
+            rotation: 0.0,
+            velocity: Vec3::zero(),
+            components: vec![],
+        };
+        let mut e1 = e0.clone();
+        e1.position = Vec3::new(10.0, 0.0, 0.0);
+        a.entities.insert(id, e0);
+        b.entities.insert(id, e1);
+        let mid = Snapshot::interpolate(&a, &b, 0.5);
+        assert_eq!(mid.entities[&id].position.x, 5.0);
+        let _ = ent(0.0);
+    }
 }

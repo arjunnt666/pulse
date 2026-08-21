@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use pulse_core::{EntityId, EntityState, Vec3};
 use pulse_server::Server;
 
 #[derive(Parser)]
@@ -10,7 +11,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Run a tiny in-process server tick loop for a few ticks
+    /// Tick a moving entity for a few frames
     Demo {
         #[arg(long, default_value = "10")]
         ticks: u32,
@@ -25,10 +26,27 @@ async fn main() -> anyhow::Result<()> {
     match cli.command {
         Commands::Demo { ticks } => {
             let mut server = Server::new(60);
+            server.spawn(EntityState {
+                id: EntityId::new(),
+                position: Vec3::zero(),
+                rotation: 0.0,
+                velocity: Vec3::new(60.0, 0.0, 0.0),
+                components: vec![],
+            });
             for _ in 0..ticks {
                 server.tick()?;
             }
-            println!("ran {} ticks, current={}", ticks, server.current_tick());
+            let pos = server
+                .latest_snapshot()
+                .and_then(|s| s.entities.values().next())
+                .map(|e| e.position.x)
+                .unwrap_or(0.0);
+            println!(
+                "ran {} ticks, current={}, entity_x={:.2}",
+                ticks,
+                server.current_tick(),
+                pos
+            );
         }
         Commands::Version => println!("pulse 0.1.0"),
     }

@@ -2,14 +2,15 @@
 
 multiplayer netcode notes that compile.
 
-vec3 math, snapshots, a tiny in-process tick loop. `pulse demo --ticks 5` actually ticks.
+vec3 math, snapshots, interpolation, a tiny in-process tick loop that integrates velocity. `pulse demo --ticks 5` prints a moving entity_x.
 
 not a game engine. not production lag compensation. a place to hang prediction and interest management without a 40gb editor.
 
 ## works today
 
 - Vec3 add / sub / scale
-- in-process server ticks
+- entity lerp and snapshot interpolate (halfway 0 to 10 is 5)
+- in-process server ticks spawn + integrate velocity
 - `pulse version` and `pulse demo`
 
 ## does not work yet

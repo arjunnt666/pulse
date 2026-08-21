@@ -1,4 +1,4 @@
-//! Authoritative server loop (stub).
+//! Authoritative in-process server tick.
 
 use pulse_core::{ClientId, EntityState, Result, Tick};
 use pulse_interest::{InterestConfig, InterestManager};
@@ -15,7 +15,9 @@ pub struct Server {
     snapshots: SnapshotBuffer,
 }
 
-struct ClientSlot { name: String }
+struct ClientSlot {
+    name: String,
+}
 
 impl Server {
     pub fn new(tick_rate: u32) -> Self {
@@ -34,12 +36,26 @@ impl Server {
         self.clients.insert(id, ClientSlot { name });
     }
 
+    pub fn spawn(&mut self, entity: EntityState) {
+        self.entities.push(entity);
+    }
+
     pub fn tick(&mut self) -> Result<()> {
+        let dt = 1.0 / (self.tick_rate.max(1) as f32);
+        for e in &mut self.entities {
+            e.position = e.position + e.velocity * dt;
+        }
         self.tick = self.tick.next();
         let snap = Snapshot::new(self.tick, self.entities.clone());
         self.snapshots.push(snap);
         Ok(())
     }
 
-    pub fn current_tick(&self) -> Tick { self.tick }
+    pub fn current_tick(&self) -> Tick {
+        self.tick
+    }
+
+    pub fn latest_snapshot(&self) -> Option<&Snapshot> {
+        self.snapshots.latest()
+    }
 }
