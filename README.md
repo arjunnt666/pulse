@@ -1,32 +1,18 @@
-# pulse
+# Pulse
 
-multiplayer netcode notes that compile.
+**is this a game engine?**
+no. it is vec3 math, snapshots, interpolation, and a tiny in process tick loop.
 
-vec3 math, snapshots, interpolation, a tiny in-process tick loop that integrates velocity. `pulse demo --ticks 5` prints a moving entity_x.
+**does it send packets?**
+not yet. there is no UDP. lag compensation and interest management are the next things I want to hang on this, not things I will pretend exist.
 
-not a game engine. not production lag compensation. a place to hang prediction and interest management without a 40gb editor.
+**so what compiles?**
+Vec3 add, sub, scale. entity lerp. snapshot interpolate (halfway from 0 to 10 is 5, the test is that boring on purpose). an in process server that spawns an entity and integrates velocity. `pulse version` and `pulse demo`.
 
-## works today
+run 5 ticks and you should see entity_x move:
 
-- Vec3 add / sub / scale
-- entity lerp and snapshot interpolate (halfway 0 to 10 is 5)
-- in-process server ticks spawn + integrate velocity
-- `pulse version` and `pulse demo`
+    cargo test --workspace
+    cargo build -p pulse-cli
+    ./target/debug/pulse demo --ticks 5
 
-## does not work yet
-
-- real UDP transport
-- tuned lag compensation
-- interest management under load
-
-## try it
-
-```bash
-cargo test --workspace
-cargo build -p pulse-cli
-./target/debug/pulse demo --ticks 5
-```
-
-## license
-
-mit. predict locally, correct later.
+MIT. predict locally, correct later, once there is something to correct against.
