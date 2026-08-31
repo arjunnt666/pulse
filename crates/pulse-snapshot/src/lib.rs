@@ -1,8 +1,12 @@
 //! World snapshots and simple delta generation.
 
 use pulse_core::{EntityId, EntityState, Tick};
-use pulse_protocol::{EntityUpdate, ServerMessage};
+use pulse_protocol::EntityUpdate;
 use std::collections::HashMap;
+
+pub use pulse_protocol::ServerMessage;
+
+
 
 #[derive(Debug, Clone)]
 pub struct Snapshot {
@@ -89,8 +93,20 @@ impl SnapshotBuffer {
         self.history.iter().find(|s| s.tick == tick)
     }
     pub fn latest(&self) -> Option<&Snapshot> { self.history.last() }
+    pub fn previous(&self) -> Option<&Snapshot> {
+        let n = self.history.len();
+        if n >= 2 {
+            self.history.get(n - 2)
+        } else {
+            None
+        }
+    }
+    pub fn latest_delta(&self) -> Option<ServerMessage> {
+        Some(self.latest()?.delta_from(self.previous()?))
+    }
     pub fn len(&self) -> usize { self.history.len() }
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -127,4 +143,31 @@ mod tests {
         assert_eq!(mid.entities[&id].position.x, 5.0);
         let _ = ent(0.0);
     }
+
+    #[test]
+    fn delta_reports_moved_entity() {
+        let id = EntityId::new();
+        let mut a = Snapshot::new(Tick::new(1), vec![]);
+        let mut b = Snapshot::new(Tick::new(2), vec![]);
+        let e0 = EntityState {
+            id,
+            position: Vec3::new(0.0, 0.0, 0.0),
+            rotation: 0.0,
+            velocity: Vec3::zero(),
+            components: vec![],
+        };
+        let mut e1 = e0.clone();
+        e1.position = Vec3::new(3.0, 0.0, 0.0);
+        a.entities.insert(id, e0);
+        b.entities.insert(id, e1);
+        match b.delta_from(&a) {
+            ServerMessage::Delta { updates, removed, .. } => {
+                assert!(removed.is_empty());
+                assert_eq!(updates.len(), 1);
+                assert_eq!(updates[0].position.unwrap().x, 3.0);
+            }
+            other => panic!("expected delta, got {other:?}"),
+        }
+    }
 }
+

@@ -58,4 +58,9 @@ impl Server {
     pub fn latest_snapshot(&self) -> Option<&Snapshot> {
         self.snapshots.latest()
     }
+
+    pub fn latest_delta(&self) -> Option<pulse_snapshot::ServerMessage> {
+        self.snapshots.latest_delta()
+    }
 }
+
